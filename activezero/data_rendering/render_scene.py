@@ -66,6 +66,35 @@ def render_scene(
     cam_intrinsic_hand = np.loadtxt(os.path.join(materials_root, "cam_intrinsic_hand.txt"))
     cam_ir_intrinsic_hand = np.loadtxt(os.path.join(materials_root, "cam_ir_intrinsic_hand.txt"))
 
+    if nerf_obj:
+        metas = None
+        with open(f"./data_rendering/nerf_pose/{nerf_obj}/transforms_{split}.json", "r") as fp:
+            metas = json.load(fp)
+
+        fov = metas['camera_angle_x']
+        width = 800
+        height = 800
+
+        focal = .5 * width / np.tan(.5 * fov)
+
+        cam_intrinsic_base[:2,2] = width/2
+        cam_ir_intrinsic_base[:2,2] = width/2
+        cam_intrinsic_hand[:2,2] = width/2
+        cam_ir_intrinsic_hand[:2,2] = width/2
+
+        cam_intrinsic_base[0,0] = focal
+        cam_intrinsic_base[1,1] = focal
+
+        cam_ir_intrinsic_base[0,0] = focal
+        cam_ir_intrinsic_base[1,1] = focal
+
+        cam_intrinsic_hand[0,0] = focal
+        cam_intrinsic_hand[1,1] = focal
+
+        cam_ir_intrinsic_hand[0,0] = focal
+        cam_ir_intrinsic_hand[1,1] = focal
+
+
 
     cam_irL_rel_extrinsic_base = np.loadtxt(
         os.path.join(materials_root, "cam_irL_rel_extrinsic_base.txt")
@@ -477,7 +506,7 @@ def render_scene(
 
         logger.info(f"finish {folder_path} rendering")
     
-    np.save(os.path.join(target_root, f"{scene_id}-pose.npy"), cam_pose_out)
+    #np.save(os.path.join(target_root, f"{scene_id}-pose.npy"), cam_pose_out)
     scene = None
 
 
